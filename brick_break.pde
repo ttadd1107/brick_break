@@ -1,39 +1,35 @@
 //https://www.openprocessing.org/sketch/134612/
 
 import java.util.Random;
-float delay = .0001;
-int rows = 9;
-int col = 9;            //global variables
-int t = col * rows;
+int t;
 Ball ball;
-Platform plat;               //creation of objects
-Blocks[] block = new Blocks[t];  //array for blocks
-
+Platform plat;
+Blocks[] block = new Blocks[t];
+float delay = .0001;
+int rows = 3;
+int col = 12;
 void setup() {
   size(1000, 800);
   background(0);
-  ball = new Ball(width/2, height/2 +100, 20);
+  ball = new Ball(width/2, height/2, 25);
   plat = new Platform(width/2, height - 25);
   rectMode(CENTER);
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j< col; j++) {
-      block[i*rows + j] = new Blocks((i+1) *width/(rows + 2), (j+1) * 50);  // places all blocks in an array
-    }
-  }
+  for (int i = 0; i<rows; i++) {
+    for(int j = 0; j < col; j++){
+  block[i*rows + j] = new Blocks((i+1) *width/(rows + 2), (j+1) * 50);
+    }  
+}
 }
 
 
 void draw() {
   background(0);
-  for (int i = 0; i<t; i++)
-  {
-    block[i].Display();    // displays all blocks 
-  }
-  collision();       //check for colision
   ball.Move();
   ball.Display();
   plat.move();
   plat.display();
+  //block.move();
+  // block.Display();
 }
 
 void ball() {
@@ -42,13 +38,8 @@ void ball() {
 }
 class Ball {
   int size;
-  int num = 4;
-  float hspeed= num;
-  float neghspeed = -num;
-  float poshspeed = num;
-  float vspeed= num;
-  float negvspeed = -num;
-  float posvspeed = num;
+  float hspeed= 4;
+  float vspeed= 4;
   float x = width/2;
   float y = height /2;
 
@@ -59,34 +50,53 @@ class Ball {
   }
   void Move() {
     // y=y +5;
-    fill(255);                                  //makes sure ball is white
-    //if (ball.x < plat.x + 75 && ball.x > plat.x -75) {            
-    //  if (plat.y +10 - ball.y < ball.size) {
-    //   // ball.vspeed = -5;
-    //  }
-    //} 
-
+    if (ball.x < plat.x + 75 && ball.x > plat.x -75) {
+      if (plat.y +10 - ball.y < ball.size) {
+        ball.vspeed = -5;
+      }
+    } 
+    // keyTyped();
     x = x + hspeed;
     y = y + vspeed;
     if (x> width) {
-      hspeed = -num;
+      hspeed = -4;
     }
     if (y>height) {
-      y = height/2 +100;
-      x = width/2;
+      vspeed = -5;
+
       // y  = sin(y)*40.0;
       //  vspeed =sin(x)*40.0;
 
       //  hspeed= hspeed*sin(y)*40.0;
     }
     if (x<0) {
-      hspeed = num;
+      hspeed = 4;
     }
     if (y<0) {
-      vspeed = num;
+      vspeed = 5;
     }
   }
 
+  void keyTyped() {
+    if (key == 'a') {
+      hspeed = -4;
+    }
+    if (key == 'd') {
+      hspeed = +4;
+    }
+    if (key == 'w') {
+      vspeed = -2;
+    }
+    if (key == 's') {
+      vspeed = +2;
+    }
+    if (key == 'l') {
+      vspeed = 0;
+    }
+    if (key == 'o') {
+      hspeed = 0;
+    }
+  }
   void Display() {
     ellipse(x, y, size, size);
   }
@@ -97,8 +107,6 @@ class Platform {
 
   float x;
   float y;
-  int wide = 150;
-  int high = 20;
   Platform(int tempX, int tempY) {
     x = tempX;
     y = tempY;
@@ -115,7 +123,7 @@ class Platform {
 
 
   void display() {
-    rect(x, y, wide, high);
+    rect(x, y, 150, 20);
   }
   void keyTyped() {
     if (key == 'a') {
@@ -126,80 +134,28 @@ class Platform {
     }
   }
 }
-void Blocks() {
+void Blocks(){
+
 }
 class Blocks {
 
-  float x =1;
-  float y= 1;
+  int x =1;
+  int y= 1;
   int size = 60;
-  int colls = 255;               //declaration of numbers
-  boolean hit;
-  int high= 25;
-  int wide = 50;
+  void move() {
+    float Mx = mouseX;                    
+    float dx = Mx - x;                     //gets x postion of mouse and moves to it refrenced
+    x += dx + delay;
+    //    if(ball.x < block.x + 60 && ball.x > block.x -60){
+    //  if(block.y +30 - ball.y < ball.size){
+    //      ball.vspeed = +5;
+    //      ball.hspeed = -5;
+    //  }
 
-  Blocks(float tempX, float tempY)
-  {
-    x = tempX;
-    y = tempY;
-    colls = 255;              //makes a call for blocks
-    hit = false;
+    //}
   }
-
-
-  void wasHit() {
-    hit = true;
-    colls = 0;
-    rect(x, y, wide, high);
-  }
-
   void Display() {
-    fill(colls);
-    // translate(width/2, height/2);
+    translate(width/2, height/2);
     rect(x, y, size, size/2);
-  }
-}
-void collision() {
-  //refrenced left plat
-  rectMode(CORNER);
-  if(ball.x >plat.x && ball.x<plat.x+(plat.wide/2)&&ball.y>plat.y-1){
-    ball.hspeed = ball.neghspeed;
-    ball.vspeed =ball.vspeed *-1;
-  }
-  // right plat
-    if(ball.x >plat.x +(plat.wide/2) && ball.x<plat.x+plat.wide &&ball.y>plat.y-1){
-    ball.hspeed = ball.poshspeed;
-    ball.vspeed =ball.vspeed *-1;
-      //rectMode(CENTER);
-
-  }
-  for (int i = 0; i < t; i ++) {
-   // if top of brick is hit by ball change direction          refrenced
-    if (ball.y + ball.size / 2 >= block[i].y &&ball.y<=(block[i].y-1)&& ball.y - ball.size /2 <= block[i].y + block[i].high/2 && ball.x >= block[i].x && ball.x <= block[i].x + block[i].wide && block[i].hit == false ) {
-      ball.vspeed =ball.vspeed *-1;
-      block[i].wasHit();
-    }
-    //if bottom of block is hit by ball change direction
-if(ball.y -(ball.size/2)>=block[i].y+block[i].high-2 && ball.y-(ball.size/2)<=block[i].y +block[i].high+2 &&ball.x>block[i].x&&ball.x<block[i].x+block[i].wide&&block[i].hit ==false){
-      ball.vspeed = ball.vspeed*-1;
-      block[i].wasHit();
-    }
-   // //collision for right side of block     refrenced
-    if (ball.x - ball.size <= block[i].x + block[i].wide && ball.x >= block[i].x + (block[i].wide + 1)&& ball.y >= block[i].y && ball.y <= block[i].y + block[i].high  && block[i].hit == false) {
-   
-      ball.hspeed = ball.poshspeed;
-     // ball.vspeed = ball.vspeed*-1;
-
-      block[i].wasHit();
-    }
-    //collision of left side of block
-     // if (ball.x + ball.size / 2 +1>= block[i].x &&ball.x>= (block[i].x -1)&& ball.x + ball.size / 2 <= block[i].x + block[i].wide / 2 && ball.y >= block[i].y && ball.y <= block[i].y + block[i].high  && block[i].hit == false) {
-      if(ball.x +(ball.size/2)>= block[i].x -2 && ball.x< block[i].x +2&& ball.y> block[i].y&&ball.y <  block[i].y+ block[i].high&& block[i].hit ==false){
-        
-      ball.hspeed = ball.neghspeed;
-     // ball.vspeed = ball.vspeed*-1;
-
-      block[i].wasHit();
-    }
   }
 }
